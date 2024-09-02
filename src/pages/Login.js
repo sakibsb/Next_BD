@@ -1,8 +1,11 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import loginIcons from '../assest/signin.gif'
 import { FiEye } from "react-icons/fi";
 import { FiEyeOff } from "react-icons/fi";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import SummaryApi from '../common';
+import { toast } from 'react-toastify'
+import Context from '../context';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -12,6 +15,9 @@ const Login = () => {
       password : ""
     }
   )
+  const navigate = useNavigate()
+  const { fetchUserDetails, fetchUserAddToCart } = useContext(Context)
+
   const handleOnChange =(e) =>{
     const{name , value} = e.target
     setData((preve)=>{
@@ -22,8 +28,30 @@ const Login = () => {
     })
   }
 
-  const handleSubmit = (e)=>{
+  const handleSubmit = async(e)=>{
     e.preventDefault()
+
+    const dataRes = await fetch(SummaryApi.signIN.url, {
+      method: SummaryApi.signIN.method,
+      credentials: 'include',
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify(data)
+    })
+
+    const dataApi = await dataRes.json()
+
+    if (dataApi.success) {
+      toast.success(dataApi.message)
+      navigate("/")
+      fetchUserDetails()
+      fetchUserAddToCart()
+    }
+
+    if (dataApi.error) {
+      toast.error(dataApi.message)
+    }
   }
   console.log("data login",data)
   return (

@@ -16,7 +16,7 @@ const Logo = ({ w, h }) => {
             <g id="Next_BD" fill="#964B00" stroke="none">
                 <path d="M20,50 h60 v-10 h-60 v10 M50,0 v30 M60,100 v-30 M20,100 v-30 M30,100 v-30" />
             </g>
-            <text x="100" y="50" fill="#000000" font-family="Arial" font-size="12" font-weight="bold">Next_BD</text>
+            <text x="100" y="50" fill="#000000" font-family="Arial" font-size="60" font-weight="bold">Next_BD</text>
             <g id="SvgjsG1032" featurekey="sloganFeature-0"
                 transform="matrix(2.0663600877799073,0,0,2.0663600877799073,119.70852494513755,103.66737189459191)"
                 fill="#292929">
