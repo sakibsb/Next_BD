@@ -1,14 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react'
-import SummaryApi from '../common'
-import Context from '../context'
-import displayBDCurrency from '../helpers/displayCurrency'
+import React, { useContext, useEffect, useState } from 'react';
+import SummaryApi from '../common';
+import Context from '../context';
+import displayBDCurrency from '../helpers/displayCurrency';
 import { MdDeleteSweep } from "react-icons/md";
+import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
-  const [data, setData] = useState([])
-  const [loading, setLoading] = useState(false)
-  const context = useContext(Context)
-  const loadingCart = new Array(context.cartProductCount).fill(null)
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const context = useContext(Context);
+  const loadingCart = new Array(context.cartProductCount).fill(null);
 
   const fetchData = async () => {
     const response = await fetch(SummaryApi.addToCartViewProduct.url, {
@@ -17,23 +18,22 @@ const Cart = () => {
       headers: {
         "content-type": "application/json"
       }
-    })
-  
-    const responseData = await response.json()
+    });
 
+    const responseData = await response.json();
     if (responseData.success) {
-      setData(responseData.data)
+      context.setCartData(responseData.data);
     }
-  }
+  };
 
-  const handleLoading =async()=>{
-    await fetchData()
-  }
   useEffect(() => {
-    setLoading(true)
-    handleLoading()
-    setLoading(false)
-  }, [])
+    const handleLoading = async () => {
+      setLoading(true);
+      await fetchData();
+      setLoading(false);
+    };
+    handleLoading();
+  }, []);
 
   const incQ = async (id, q) => {
     const response = await fetch(SummaryApi.updateCartProduct.url, {
@@ -43,18 +43,16 @@ const Cart = () => {
         "content-type": "application/json"
       },
       body: JSON.stringify({
-        _id : id ,
+        _id: id,
         quantity: q + 1
       })
-    })
+    });
 
-    const responseData = await response.json()
-
+    const responseData = await response.json();
     if (responseData.success) {
-      fetchData()
+      fetchData();
     }
-
-  }
+  };
 
   const decQ = async (id, q) => {
     if (q > 1) {
@@ -68,16 +66,16 @@ const Cart = () => {
           _id: id,
           quantity: q - 1
         })
-      })
+      });
 
-      const responseData = await response.json()
-
+      const responseData = await response.json();
       if (responseData.success) {
-        fetchData()
+        fetchData();
       }
     }
-  }
-  const deleteCartProduct = async(id)=>{
+  };
+
+  const deleteCartProduct = async (id) => {
     const response = await fetch(SummaryApi.deleteCartProduct.url, {
       method: SummaryApi.deleteCartProduct.method,
       credentials: 'include',
@@ -87,99 +85,113 @@ const Cart = () => {
       body: JSON.stringify({
         _id: id,
       })
-    })
+    });
 
-    const responseData = await response.json()
-
+    const responseData = await response.json();
     if (responseData.success) {
-      fetchData()
-      context.fetchUserAddToCart()
+      fetchData();
+      context.fetchUserAddToCart();
     }
-  }
+  };
 
-  const totalQ = data.reduce((previousValue, currentValue) => previousValue + currentValue.quantity , 0)
+  const totalQ = context.cartData?.reduce((previousValue, currentValue) => previousValue + currentValue.quantity, 0);
+  const totalprize = context.cartData?.reduce((preve, curr) => preve + (curr.quantity * curr?.productId?.sellingPrice), 0);
 
-  const totalprize = data.reduce((preve, curr) => preve + (curr.quantity * curr?.productId?.sellingPrice) , 0)
+  // Use effect for back button navigation
+  useEffect(() => {
+    const handleBackButton = (event) => {
+      if (event.key === 'Backspace') { // You can choose any key; here it's Backspace for demonstration
+        event.preventDefault(); // Prevent the default backspace behavior
+        navigate(-1); // Navigate to the previous page
+      }
+    };
+
+    window.addEventListener('keydown', handleBackButton);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener('keydown', handleBackButton);
+    };
+  }, [navigate]);
+
   return (
     <div className='container mx-auto'>
-      <div className=' text-center text-lg my-3'>
+      <h1 className='text-2xl font-bold text-center my-6'>Your Shopping Cart</h1>
+      <div className='text-center text-lg my-3'>
         {
-          data.length === 0 && !loading && (
-            <p className='bg-white py-5'>No Information</p>
+          context.cartData?.length === 0 && !loading && (
+            <p className='bg-off-white py-5 text-gray-500'>Your cart is empty!</p>
           )
         }
       </div>
       <div className='flex flex-col lg:flex-row gap-10 lg:justify-between p-4'>
-        {/***View Product In User Cart */}
+        {/*** View Product In User Cart */}
         <div className='w-full max-w-3xl'>
           {
             loading ? (
-              loadingCart.map((el,index) => {
-                return (
-                  <div className='w-full bg-slate-200 h-32 my-2 border border-slate-300 animate-pulse rounded' key={el + "Add To Cart Loading"+index}>
-
-                  </div>
-                )
-              })
+              loadingCart.map((el, index) => (
+                <div className='w-full bg-creamy h-32 my-2 border border-gray-300 animate-pulse rounded-lg' key={el + "Add To Cart Loading" + index}></div>
+              ))
             ) : (
-              data.map((product, index) => {
-                return (
-                  <div className='w-full bg-white h-32 my-2 border border-slate-300 rounded grid grid-cols-[128px,1fr]' key={product?._id + "Add To Cart Loading"}>
-                    <div className='w-32 h-32 bg-slate-200'>
-                      <img src={product?.productId?.productImage[0]} className='w-full h-full object-scale-down mix-blend-multiply' alt='' />
+              context.cartData?.map((product) => (
+                <div className='w-full bg-off-white h-auto my-2 border border-gray-300 rounded-lg shadow-md flex items-center p-4' key={product?._id}>
+                  <div className='w-32 h-32 bg-gray-200 rounded-l-lg flex items-center justify-center'>
+                    <img src={product?.productId?.productImage[0]} className='w-full h-full object-contain' alt='' />
+                  </div>
+                  <div className='relative flex flex-col justify-between w-full pl-4'>
+                    <div className='flex justify-between items-start'>
+                      <h2 className='text-lg lg:text-xl font-semibold text-gray-800 line-clamp-2'>{product?.productId?.productName}</h2>
+                      <MdDeleteSweep className='text-2xl cursor-pointer text-red-500 hover:text-red-700' onClick={() => deleteCartProduct(product?._id)} />
                     </div>
-                    {/***Delete Product */}
-                    <div className='relative'>
-                      <div className='absolute right-0 p-1 hover:rounded-full hover:bg-blue-700 hover:text-white cursor-pointer' onClick={() => deleteCartProduct(product?._id)}>
-                        <MdDeleteSweep className='text-3xl'/>
-                      </div>
-                      <h2 className='text-lg lg:text-xl text-ellipsis line-clamp-1 px-5'>{product?.productId?.productName}</h2>
-                      <p className='capitalize text-slate-500 px-5'>{product?.productId?.category}</p>
-                      <div className='flex justify-between items-center'>
-                        <p className='px-5 font-medium text-lg text-blue-900'>{displayBDCurrency(product?.productId?.sellingPrice)}</p>
-                        <p className='px-5 font-medium text-lg text-blue-900'>Total :{displayBDCurrency(product?.productId?.sellingPrice * product?.quantity)}</p>
-                      </div>
-                      <div className='flex  items-center px-5 py-2 gap-3 '>
-                        <button className=' bg-blue-700 text-white border border-black w-28 h-8 flex justify-center items-center hover:bg-white hover:text-blue-800 cursor-pointer font-semibold ' onClick={() => decQ(product?._id, product?.quantity)}>-</button>
-                        <span>{product?.quantity}</span>
-                        <button className=' bg-blue-700 text-white border border-black w-28 h-8  flex justify-center items-center hover:bg-white hover:text-blue-800 cursor-pointer font-semibold' onClick={() => incQ(product?._id, product?.quantity)}>+</button>
+                    <p className='capitalize text-gray-500'>{product?.productId?.category}</p>
+                    <div className='flex justify-between items-center'>
+                      <p className='font-medium text-lg text-gray-800'>{displayBDCurrency(product?.productId?.sellingPrice)}</p>
+                      <p className='font-medium text-lg text-gray-900'>Total: {displayBDCurrency(product?.productId?.sellingPrice * product?.quantity)}</p>
+                    </div>
+                    <div className='flex justify-center items-center mt-4 border-t border-gray-300 pt-2'>
+                      <div className='flex items-center justify-center gap-2'>
+                        <button className='rounded-md  bg-gray-400 border border-gray-300 text-white w-10 h-10 flex justify-center items-center hover:bg-gray-500 transition-colors' onClick={() => decQ(product?._id, product?.quantity)}>-</button>
+                        <span className='text-lg'>{product?.quantity}</span>
+                        <button className='rounded-md  bg-gray-400 border border-gray-300 text-white w-10 h-10 flex justify-center items-center hover:bg-gray-500 transition-colors' onClick={() => incQ(product?._id, product?.quantity)}>+</button>
                       </div>
                     </div>
                   </div>
-                )
-              })
+                </div>
+              ))
             )
           }
         </div>
-        {/***Total Product */}
-        <div className='mt-5 lg-mt-0 w-full max-w-sm'>
+        {/*** Total Product */}
+        <div className='mt-5 lg:mt-0 w-full max-w-sm'>
           {
             loading ? (
-              <div className='h-36 bg-slate-200 border border-slate-200 animate-pulse'>
-
-              </div>
+              <div className='h-36 bg-gray-200 border border-gray-200 animate-pulse'></div>
             ) : (
-              <div>
-                <div className='h-36 bg-white'>
-                  <h2 className='text-white bg-black px-4 py-2'>Summary </h2>
-                  <div className='flex px-4 gap-3'>
-                    <p className='text-sm font-semibold'>Quantity : </p>
-                    <p className='text-sm font-semibold'>{totalQ}</p>
-                  </div>
-                    <div className='flex px-4 gap-3'>
-                      <p className='text-sm font-semibold'>Total Prize :</p>
-                      <p className='text-sm font-semibold'>{displayBDCurrency(totalprize)}</p>
-                  </div>
-                  <button className='bg-blue-700 p-2 text-white w-full'>Payment</button>
+              <div className='h-36 bg-off-white rounded-lg shadow-md'>
+                <h2 className='text-white bg-gray-700 px-4 py-2 rounded-t-lg text-center'>Summary</h2>
+                <div className='flex justify-between px-4 py-2'>
+                  <p className='text-sm font-semibold'>Quantity:</p>
+                  <p className='text-sm font-semibold'>{totalQ}</p>
+                </div>
+                <div className='flex justify-between px-4 py-2'>
+                  <p className='text-sm font-semibold'>Total Price:</p>
+                  <p className='text-sm font-semibold'>{displayBDCurrency(totalprize)}</p>
+                </div>
+                <div className='flex justify-center'>
+                  <button
+                    className='rounded-md bg-gray-600 hover:bg-gray-700 transition-colors text-white p-3 w-full mt-3'
+                    onClick={() => navigate('/purchase')} // Ensure this line is included
+                  >
+                    Proceed to Payment
+                  </button>
                 </div>
               </div>
             )
           }
         </div>
-
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Cart
+export default Cart;

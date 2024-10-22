@@ -13,7 +13,8 @@ import { setUserDetails } from './store/userSlice';
 
 function App() {
   const dispatch = useDispatch()
-  const [cartProductCount,setCartProductCount] = useState(0)
+  const [cartProductCount, setCartProductCount] = useState(0)
+  const [cartData, setCartData] = useState([])
 
   const fetchUserDetails = async () => {
     const dataResponse = await fetch(SummaryApi.current_user.url, {
@@ -28,7 +29,7 @@ function App() {
     }
   }
 
-  const fetchUserAddToCart =async()=>{
+  const fetchUserAddToCart = async () => {
     const dataResponse = await fetch(SummaryApi.addToCartProductCount.url, {
       method: SummaryApi.addToCartProductCount.method,
       credentials: 'include'
@@ -43,15 +44,17 @@ function App() {
     fetchUserDetails()
 
     fetchUserAddToCart()
-  },[])
+  }, [])
   return (
     <>
       <Context.Provider value={{
         fetchUserDetails,
         cartProductCount,
-        fetchUserAddToCart
+        fetchUserAddToCart,
+        cartData,
+        setCartData
       }}>
-        <ToastContainer position='top-center'/>
+        <ToastContainer position='top-center' />
         <Header />
         <main className='min-h-[calc(100vh-120px)] pt-16'>
           <Outlet />

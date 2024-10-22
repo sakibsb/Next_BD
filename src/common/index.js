@@ -1,20 +1,20 @@
 const backendDomain = "http://localhost:8080"
 
 const SummaryApi = {
-    signUP :{
-        url: `${backendDomain}/api/signup` ,
-        method :"post"
+    signUP: {
+        url: `${backendDomain}/api/signup`,
+        method: "post"
     },
     signIN: {
         url: `${backendDomain}/api/signin`,
         method: "post"
-    } ,
+    },
 
-    current_user :{
-        url: `${backendDomain}/api/user-details` ,
+    current_user: {
+        url: `${backendDomain}/api/user-details`,
         method: "get"
     },
-    logout_user : {
+    logout_user: {
         url: `${backendDomain}/api/userLogout`,
         method: "get"
     },
@@ -22,11 +22,11 @@ const SummaryApi = {
         url: `${backendDomain}/api/all-user`,
         method: "get"
     },
-    updateUser : {
+    updateUser: {
         url: `${backendDomain}/api/update-user`,
         method: "post"
     },
-    uploadProduct : {
+    uploadProduct: {
         url: `${backendDomain}/api/upload-product`,
         method: "post"
     },
@@ -42,42 +42,46 @@ const SummaryApi = {
         url: `${backendDomain}/api/get-categoryProduct`,
         method: "get"
     },
-    categoryWiseProduct : {
+    categoryWiseProduct: {
         url: `${backendDomain}/api/category-Product`,
         method: "post"
     },
-    productDetails :{
+    productDetails: {
         url: `${backendDomain}/api/product-details`,
-        method :"post"
+        method: "post"
     },
-    addToCartProduct : {
+    addToCartProduct: {
         url: `${backendDomain}/api/addtocart`,
         method: "post"
     },
-    addToCartProductCount : {
+    addToCartProductCount: {
         url: `${backendDomain}/api/countAddToCart`,
         method: "get"
     },
-    addToCartViewProduct : {
+    addToCartViewProduct: {
         url: `${backendDomain}/api/cart-product-view`,
         method: "get"
     },
-    updateCartProduct : {
+    updateCartProduct: {
         url: `${backendDomain}/api/update`,
-        method : "post"
+        method: "post"
     },
-    deleteCartProduct : {
+    deleteCartProduct: {
         url: `${backendDomain}/api/delete`,
         method: "post"
     },
-    searchProduct : {
+    searchProduct: {
         url: `${backendDomain}/api/search`,
         method: "get"
     },
     filterProduct: {
         url: `${backendDomain}/api/filter-product`,
         method: "post"
-    }, 
+    },
+    getPlaymentLink: {
+        url: `${backendDomain}/api/get-payment-link`,
+        method: "post"
+    },
 
 }
 

@@ -1,4 +1,4 @@
-import {createBrowserRouter,} from "react-router-dom";
+import { createBrowserRouter, } from "react-router-dom";
 import App from "../App";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
@@ -11,32 +11,33 @@ import CategoryProduct from "../pages/CategoryProduct";
 import ProductDetails from "../pages/ProductDetails";
 import Cart from "../pages/Cart";
 import SearchProduct from "../pages/SearchProduct";
+import PurchasePage from "../pages/purchase";
 
 const router = createBrowserRouter([
     {
-        path :"/",
-        element : <App/>,
-        children :[
+        path: "/",
+        element: <App />,
+        children: [
             {
-                path : "",
-                element : <Home/>
+                path: "",
+                element: <Home />
             },
             {
-                path :"login",
-                element :<Login/>
+                path: "login",
+                element: <Login />
             },
             {
-                path :"forgot-password",
-                element: <ForgotPassword/>
+                path: "forgot-password",
+                element: <ForgotPassword />
             }
             ,
             {
-                path:"sign-up",
-                element : <SignUp/>
+                path: "sign-up",
+                element: <SignUp />
             }
             ,
             {
-                path : "product-category",
+                path: "product-category",
                 element: <CategoryProduct />
             },
             {
@@ -44,20 +45,24 @@ const router = createBrowserRouter([
                 element: <ProductDetails />
             },
             {
-                path : "cart",
-                element : <Cart/>
+                path: "cart",
+                element: <Cart />
             },
             {
-                path : "search" ,
-                element : <SearchProduct/>
+                path: "purchase",
+                element: <PurchasePage />
             },
             {
-                path:"admin-panel",
-                element :<AdminPanel/>,
+                path: "search",
+                element: <SearchProduct />
+            },
+            {
+                path: "admin-panel",
+                element: <AdminPanel />,
                 children: [
                     {
                         path: "all-users",
-                        element : <AllUsers/>
+                        element: <AllUsers />
                     },
                     {
                         path: "products",
