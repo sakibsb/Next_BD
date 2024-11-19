@@ -97,23 +97,6 @@ const Cart = () => {
   const totalQ = context.cartData?.reduce((previousValue, currentValue) => previousValue + currentValue.quantity, 0);
   const totalprize = context.cartData?.reduce((preve, curr) => preve + (curr.quantity * curr?.productId?.sellingPrice), 0);
 
-  // Use effect for back button navigation
-  useEffect(() => {
-    const handleBackButton = (event) => {
-      if (event.key === 'Backspace') { // You can choose any key; here it's Backspace for demonstration
-        event.preventDefault(); // Prevent the default backspace behavior
-        navigate(-1); // Navigate to the previous page
-      }
-    };
-
-    window.addEventListener('keydown', handleBackButton);
-
-    // Cleanup event listener on component unmount
-    return () => {
-      window.removeEventListener('keydown', handleBackButton);
-    };
-  }, [navigate]);
-
   return (
     <div className='container mx-auto'>
       <h1 className='text-2xl font-bold text-center my-6'>Your Shopping Cart</h1>
@@ -134,27 +117,20 @@ const Cart = () => {
               ))
             ) : (
               context.cartData?.map((product) => (
-                <div className='w-full bg-off-white h-auto my-2 border border-gray-300 rounded-lg shadow-md flex items-center p-4' key={product?._id}>
+                <div className='w-full bg-off-white h-auto my-2 border border-gray-300 rounded-lg shadow-md grid grid-cols-[auto,1fr] gap-4 p-4 relative' key={product?._id}>
                   <div className='w-32 h-32 bg-gray-200 rounded-l-lg flex items-center justify-center'>
                     <img src={product?.productId?.productImage[0]} className='w-full h-full object-contain' alt='' />
                   </div>
-                  <div className='relative flex flex-col justify-between w-full pl-4'>
-                    <div className='flex justify-between items-start'>
-                      <h2 className='text-lg lg:text-xl font-semibold text-gray-800 line-clamp-2'>{product?.productId?.productName}</h2>
-                      <MdDeleteSweep className='text-2xl cursor-pointer text-red-500 hover:text-red-700' onClick={() => deleteCartProduct(product?._id)} />
-                    </div>
+                  <div className='flex flex-col justify-between'>
+                    <h2 className='text-lg lg:text-xl font-semibold text-gray-800 line-clamp-2'>{product?.productId?.productName}</h2>
                     <p className='capitalize text-gray-500'>{product?.productId?.category}</p>
                     <div className='flex justify-between items-center'>
                       <p className='font-medium text-lg text-gray-800'>{displayBDCurrency(product?.productId?.sellingPrice)}</p>
                       <p className='font-medium text-lg text-gray-900'>Total: {displayBDCurrency(product?.productId?.sellingPrice * product?.quantity)}</p>
                     </div>
-                    <div className='flex justify-center items-center mt-4 border-t border-gray-300 pt-2'>
-                      <div className='flex items-center justify-center gap-2'>
-                        <button className='rounded-md  bg-gray-400 border border-gray-300 text-white w-10 h-10 flex justify-center items-center hover:bg-gray-500 transition-colors' onClick={() => decQ(product?._id, product?.quantity)}>-</button>
-                        <span className='text-lg'>{product?.quantity}</span>
-                        <button className='rounded-md  bg-gray-400 border border-gray-300 text-white w-10 h-10 flex justify-center items-center hover:bg-gray-500 transition-colors' onClick={() => incQ(product?._id, product?.quantity)}>+</button>
-                      </div>
-                    </div>
+                  </div>
+                  <div className='absolute top-2 right-2 text-3xl'>
+                    <MdDeleteSweep className='cursor-pointer text-red-500 hover:text-red-700' onClick={() => deleteCartProduct(product?._id)} />
                   </div>
                 </div>
               ))
@@ -179,8 +155,8 @@ const Cart = () => {
                 </div>
                 <div className='flex justify-center'>
                   <button
-                    className='rounded-md bg-gray-600 hover:bg-gray-700 transition-colors text-white p-3 w-full mt-3'
-                    onClick={() => navigate('/purchase')} // Ensure this line is included
+                    className='rounded-md bg-blue-600 hover:bg-blue-700 transition-colors text-white p-3 w-full mt-3'
+                    onClick={() => navigate('/purchase')}
                   >
                     Proceed to Payment
                   </button>

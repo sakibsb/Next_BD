@@ -82,6 +82,10 @@ const SummaryApi = {
         url: `${backendDomain}/api/get-payment-link`,
         method: "post"
     },
+    getPriceRange: {
+        url: (category) => `${backendDomain}/api/price-range/${category}`,
+        method: "get"
+    },
 
 }
 

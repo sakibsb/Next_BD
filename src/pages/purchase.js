@@ -28,6 +28,9 @@ const PurchasePage = () => {
         }
     };
 
+    // Calculate total amount
+    const totalAmount = cartData?.reduce((preve, curr) => preve + (curr.quantity * curr?.productId?.sellingPrice), 0);
+
     return (
         <section className='container mx-auto p-6 w-full h-full flex justify-center items-center'>
             <div className='space-y-10 p-6 rounded-lg border bg-white lg:w-[50%] md:w-[65%] sm:w-[75%] w-full shadow-lg'>
@@ -89,8 +92,15 @@ const PurchasePage = () => {
                         {errors.country && <small className='text-red-500'>Country is required</small>}
                     </div>
 
-                    <button type='submit' className='bg-green-500 hover:bg-green-600 transition-colors p-3 text-white w-full rounded-md'>
-                        Pay
+                    {/* Total Payment */}
+                    <div className='flex justify-between items-center'>
+                        <p className='text-lg font-semibold text-gray-800'>Total Payment:</p>
+                        <p className='text-lg font-semibold text-gray-900'>{totalAmount} BDT</p>
+                    </div>
+
+                    {/* Updated Button */}
+                    <button type='submit' className='bg-blue-600 hover:bg-blue-700 transition-colors p-4 text-white w-full rounded-lg font-semibold text-xl flex justify-center items-center'>
+                        Proceed to Payment - {totalAmount} BDT
                     </button>
                 </form>
             </div>

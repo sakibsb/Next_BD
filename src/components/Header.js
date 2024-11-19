@@ -49,7 +49,7 @@ const Header = () => {
   };
 
   return (
-    <header className="h-16 shadow-md bg-gradient-to-r from-blue-700 to-blue-500 fixed w-full z-40">
+    <header className="h-16 shadow-md bg-[#F5F5F5] fixed w-full z-40">
       <div className="container mx-auto flex items-center justify-between px-6">
         {/* Logo Section */}
         <Link to={"/"}>
@@ -57,7 +57,7 @@ const Header = () => {
         </Link>
 
         {/* Search Bar */}
-        <div className="hidden lg:flex items-center w-full justify-between max-w-md border border-blue-900 rounded-full shadow-lg pl-3 bg-[#FAFAFA]">
+        <div className="hidden lg:flex items-center w-full justify-between max-w-md border border-gray-300 rounded-full shadow-lg pl-3 bg-white">
           <input
             type="text"
             placeholder="Search products..."
@@ -65,7 +65,7 @@ const Header = () => {
             onChange={handleSearch}
             value={search}
           />
-          <div className="text-lg min-w-[50px] h-10 bg-blue-600 text-white flex items-center justify-center rounded-r-full hover:bg-blue-700 transition duration-300">
+          <div className="text-lg min-w-[50px] h-10 bg-gray-600 text-white flex items-center justify-center rounded-r-full hover:bg-gray-700 transition duration-300">
             <FaSearch />
           </div>
         </div>
@@ -82,11 +82,11 @@ const Header = () => {
                 {user?.profilePic ? (
                   <img
                     src={user?.profilePic}
-                    className="w-10 h-10 rounded-full border-2 border-white shadow-lg"
+                    className="w-10 h-10 rounded-full border-2 border-gray-300 shadow-lg"
                     alt={user?.name}
                   />
                 ) : (
-                  <FaCircleUser className="text-white" />
+                  <FaCircleUser className="text-gray-600" />
                 )}
               </div>
             )}
@@ -96,7 +96,7 @@ const Header = () => {
                   {user?.role === ROLE.ADMIN && (
                     <Link
                       to={"/admin-panel/products"}
-                      className="block text-gray-700 hover:bg-gray-200 p-2 rounded-md"
+                      className="block text-gray-700 hover:bg-gray-100 p-2 rounded-md"
                       onClick={() => setMenuDisplay(false)}
                     >
                       Admin Panel
@@ -115,7 +115,7 @@ const Header = () => {
 
           {/* Cart Icon */}
           {user?._id && (
-            <Link to={"/cart"} className="relative text-white text-3xl">
+            <Link to={"/cart"} className="relative text-gray-600 text-3xl">
               <AiOutlineShoppingCart />
               <div className="bg-red-600 text-white w-5 h-5 rounded-full p-1 flex items-center justify-center absolute -top-2 -right-3">
                 <p className="text-sm">{context?.cartProductCount}</p>

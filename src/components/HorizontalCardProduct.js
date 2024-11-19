@@ -43,19 +43,21 @@ const HorizontalCardProduct = ({ category, heading }) => {
             <h2 className='text-2xl font-semibold py-4 text-[#333333]'>{heading}</h2>
 
             <div className='flex items-center gap-4 md:gap-6 overflow-scroll scrollbar-none transition-all' ref={scrollElement}>
+                {/* Left Scroll Button */}
                 <button
-                    className='bg-white shadow-lg rounded-full p-2 absolute left-0 text-lg hidden md:block hover:bg-[#5BC0BE] transition duration-300'
+                    className='bg-white shadow-lg rounded-full p-2 absolute left-0 text-lg hidden md:block hover:bg-[#5BC0BE] transition duration-300 z-10'
                     onClick={scrollLeft}
                     aria-label="Scroll left"
                 >
-                    <FaAnglesLeft />
+                    <FaAnglesLeft className='text-gray-800' />
                 </button>
+                {/* Right Scroll Button */}
                 <button
-                    className='bg-white shadow-lg rounded-full p-2 absolute right-0 text-lg hidden md:block hover:bg-[#5BC0BE] transition duration-300'
+                    className='bg-white shadow-lg rounded-full p-2 absolute right-0 text-lg hidden md:block hover:bg-[#5BC0BE] transition duration-300 z-10'
                     onClick={scrollRight}
                     aria-label="Scroll right"
                 >
-                    <FaAnglesRight />
+                    <FaAnglesRight className='text-gray-800' />
                 </button>
 
                 {loading ? (

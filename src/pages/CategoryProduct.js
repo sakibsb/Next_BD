@@ -1,16 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import productCategory from '../helpers/productCategory';
 import VerticalProductCart from '../components/VerticalProductCart';
 import SummaryApi from '../common';
+import RangeSlider from "react-range-slider-input";
+import "react-range-slider-input/dist/style.css";
 
 const CategoryProduct = () => {
+  const [searchParams] = useSearchParams() 
   const [data, setData] = useState([]);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const location = useLocation();
   const urlSearch = new URLSearchParams(location.search);
   const urlCategoryListInArray = urlSearch.getAll("category");
+
 
   const urlCategoryListObject = {};
   urlCategoryListInArray.forEach(el => {
@@ -20,6 +24,47 @@ const CategoryProduct = () => {
   const [selectCategory, setSelectCategory] = useState(urlCategoryListObject);
   const [filterCL, setFilterCL] = useState([]);
   const [sortBy, setSoryBy] = useState("");
+  const [priceRange, setPriceRange] = useState([0, 0]);
+  const [selectedPriceRange, setSelectedPriceRange] = useState([0, 0]);
+
+  const getPriceRange = useMemo(() => async (categorry) => {
+    const res = await fetch(SummaryApi.getPriceRange.url(categorry), {
+      method: SummaryApi.getPriceRange.method,
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!res.ok) {
+      setPriceRange([0, 0])
+    }
+
+    const { data } = await res.json()
+
+    return [data.minPrice, data.maxPrice]
+  }, [])
+
+  useEffect(() => {
+    const get = async() => {
+      const allMinMaxPricePromise = urlCategoryListInArray.map((categorry) => getPriceRange(categorry))
+      const allMinMax = await Promise.all(allMinMaxPricePromise)
+      
+      const minPrices = allMinMax.map(range => range[0]); // [9, 20]
+      const maxPrices = allMinMax.map(range => range[1]); // [100, 300]
+      // Find the overall minimum and maximum
+      const overallMin = Math.min(...minPrices);
+      const overallMax = Math.max(...maxPrices);
+
+      setPriceRange([overallMin, overallMax])
+      setSelectedPriceRange([overallMin, overallMax])
+    }
+    get()
+    
+
+    // getPriceRange(urlCategoryListInArray[0])
+  }, [urlCategoryListInArray])
+
 
   const fetchData = async () => {
     const response = await fetch(SummaryApi.filterProduct.url, {
@@ -28,7 +73,9 @@ const CategoryProduct = () => {
         "content-type": "application/json"
       },
       body: JSON.stringify({
-        category: filterCL
+        category: filterCL,
+        minPrice: selectedPriceRange[0],
+        maxPrice: selectedPriceRange[1] || 1000,
       })
     });
 
@@ -37,7 +84,7 @@ const CategoryProduct = () => {
   };
 
   const handleSelectCategory = (e) => {
-    const { name, value, checked } = e.target;
+    const { value, checked } = e.target;
     setSelectCategory((prev) => {
       return {
         ...prev,
@@ -48,7 +95,7 @@ const CategoryProduct = () => {
 
   useEffect(() => {
     fetchData();
-  }, [filterCL]);
+  }, [filterCL, selectedPriceRange]);
 
   useEffect(() => {
     const arrayOfCategory = Object.keys(selectCategory).map(categoryKeyName => {
@@ -76,29 +123,56 @@ const CategoryProduct = () => {
     }
   };
 
-  // Use the useEffect to navigate back when the backspace key is pressed
+  // const handleApplyPriceFilter = () => {
+  //   const filteredData = data.filter(product => {
+  //     return (
+  //       product.sellingPrice >= minPrice && product.sellingPrice <= maxPrice
+  //     );
+  //   });
+  //   setData(filteredData);
+  // };
+
+  // const resetPriceFilter = () => {
+  //   setMinPrice("");
+  //   setMaxPrice("");
+  //   fetchData();
+  // };
+
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === 'Backspace') {
-        event.preventDefault(); // Optional: Prevent the default behavior if needed
-        navigate(-1); // Navigate back to the previous page
+        event.preventDefault();
+        navigate(-1);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
 
-    // Cleanup the event listener on component unmount
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [navigate]);
+
+  // const handleMinPriceChange = (e) => {
+  //   const value = e.target.value;
+  //   if (value === '' || /^[0-9]*$/.test(value)) {
+  //     setMinPrice(value);
+  //   }
+  // };
+
+  // const handleMaxPriceChange = (e) => {
+  //   const value = e.target.value;
+  //   if (value === '' || /^[0-9]*$/.test(value)) {
+  //     setMaxPrice(value);
+  //   }
+  // };
 
   return (
     <div className='container mx-auto p-4'>
       {/***Desktop Version */}
       <div className='hidden lg:grid grid-cols-[200px,1fr]'>
         {/***Left Part */}
-        <div className='bg-white p-2 min-h-[calc(115vh-200px)] overflow-y-scroll'>
+        <div className='bg-white p-2 min-h-[calc(115vh-200px)] overflow-y-scroll space-y-6'>
           <div className=''>
             <h2 className='text-sm uppercase font-medium text-slate-500 border border-slate-300 justify-center text-center pb-1'>Sort By Price</h2>
             <form className='text-sm flex flex-col gap-2 py-2'>
@@ -112,6 +186,48 @@ const CategoryProduct = () => {
               </div>
             </form>
           </div>
+
+          <div className=''>
+            <h2 className='text-sm uppercase font-medium text-slate-500 border border-slate-300 justify-center text-center pb-1'>Price Range</h2>
+            <form className='text-sm py-2'>
+              <div className='flex flex-col gap-4'>
+
+                {/* Sliders */}
+                <div className='space-y-3'>
+                  <div className='flex justify-between items-center'>
+                    <small className='inline-block'>Min: {selectedPriceRange[0]}</small>
+                    <small className='inline-block'>Max: {selectedPriceRange[1]}</small>
+                  </div>
+                  <RangeSlider
+                    min={priceRange[0]}
+                    max={priceRange[1]}
+                    step={10}
+                    value={selectedPriceRange}
+                    onInput={setSelectedPriceRange}
+                  />
+                </div>
+              </div>
+
+
+              {/* <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleApplyPriceFilter}
+                  className="bg-blue-500 text-white p-2 mt-2 w-full"
+                >
+                  Apply Filter
+                </button>
+                <button
+                  type="button"
+                  onClick={resetPriceFilter}
+                  className="bg-gray-300 text-black p-2 mt-2 w-full"
+                >
+                  Clear Filter
+                </button>
+              </div> */}
+            </form>
+          </div>
+
           <div className=''>
             <h2 className='text-sm uppercase font-medium text-slate-500 border border-slate-300 justify-center text-center pb-1'>Category</h2>
             <form className='text-sm flex flex-col gap-2 py-2'>
@@ -128,6 +244,7 @@ const CategoryProduct = () => {
             </form>
           </div>
         </div>
+
         {/***Right Part */}
         <div className='px-4'>
           <p className='font-semibold text-blue-800 text-lg my-1 bg-white flex justify-center items-center w-auto'>Search Results: {data.length}</p>

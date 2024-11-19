@@ -48,6 +48,7 @@ const ProductDetails = () => {
 
     useEffect(() => {
         fetchProductDetails();
+        window.scrollTo(0, 0); // Scroll to top on component mount
     }, [params]);
 
     const handleMouseEnterProduct = (imageURL) => {
@@ -78,28 +79,10 @@ const ProductDetails = () => {
         navigate("/cart");
     };
 
-    // Function to navigate back
-    const handleBack = () => {
-        navigate(-1); // Navigate to the previous page
+    const handleProductClick = (productId) => {
+        navigate(`/product/${productId}`); // Adjust this based on your route structure
+        window.scrollTo(0, 0); // Scroll to top of the page
     };
-
-    // Function to handle key down events
-    const handleKeyDown = (event) => {
-        if (event.key === 'Backspace') {
-            event.preventDefault(); // Prevent default behavior of backspace
-            handleBack(); // Call the handleBack function
-        }
-    };
-
-    useEffect(() => {
-        // Add event listener for keydown
-        window.addEventListener('keydown', handleKeyDown);
-
-        // Cleanup the event listener on component unmount
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-        };
-    }, []);
 
     return (
         <div className='container mx-auto p-4'>
@@ -185,24 +168,27 @@ const ProductDetails = () => {
                             <p className='text-red-600'>{displayBDCurrency(data.sellingPrice)}</p>
                             <p className='text-slate-400 line-through'>{displayBDCurrency(data.price)}</p>
                         </div>
-                        <div className='flex items-center gap-3 my-2'>
-                            <button className='border-2 border-blue-600 rounded px-3 py-1 min-w-[100px] font-semibold hover:bg-blue-950 hover:text-white' onClick={(e) => handleBuyProduct(e, data?._id)}>Buy</button>
-                            <button className='border-2 border-blue-600 rounded px-3 py-1 min-w-[100px] font-semibold hover:bg-blue-950 hover:text-white' onClick={(e) => handleAddToCart(e, data?._id)}>Add To Cart</button>
-                        </div>
+                        {/* Conditionally render buttons based on zoom state */}
+                        {!zoom && (
+                            <div className='flex items-center gap-3 my-2'>
+                                <button className='border-2 border-blue-600 rounded-full px-4 py-2 min-w-[100px] font-semibold bg-blue-600 text-white transition-transform transform hover:scale-105 hover:shadow-lg' onClick={(e) => handleBuyProduct(e, data?._id)}>
+                                    Buy
+                                </button>
+                                <button className='border-2 border-blue-600 rounded-full px-4 py-2 min-w-[100px] font-semibold bg-blue-600 text-white transition-transform transform hover:scale-105 hover:shadow-lg' onClick={(e) => handleAddToCart(e, data?._id)}>
+                                    Add to Cart
+                                </button>
+                            </div>
+                        )}
                         <div>
-                            <p className='text-slate-600 font-semibold my-1'>Description:</p>
-                            <p>{data.description}</p>
+                            <h3 className='text-xl font-semibold'>Description</h3>
+                            <p className='my-1'>{data.description}</p>
                         </div>
                     </div>
                 )}
             </div>
-
-            {/* Related Products */}
-            <h2 className='text-xl lg:text-2xl font-semibold mt-5'>Related Products</h2>
-            <CategoryWiseProductDisplay category={data?.category} />
-
-            {/* Back Button */}
-            <button className='mt-5 p-2 bg-blue-600 text-white rounded' onClick={handleBack}>Back</button>
+            {/* Category Wise Products */}
+            <h2 className='text-2xl font-semibold my-4'>Related Products</h2>
+            <CategoryWiseProductDisplay handleProductClick={handleProductClick} category={data.category} />
         </div>
     );
 };

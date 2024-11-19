@@ -15,28 +15,6 @@ const AdminPanel = () => {
         }
     }, [user, navigate]);
 
-    const handleBack = () => {
-        navigate(-1); // Navigate to the previous page
-    };
-
-    // Function to handle key down events
-    const handleKeyDown = (event) => {
-        if (event.key === 'Backspace') {
-            event.preventDefault(); // Prevent default behavior of backspace
-            handleBack(); // Call the handleBack function
-        }
-    };
-
-    useEffect(() => {
-        // Add event listener for keydown
-        window.addEventListener('keydown', handleKeyDown);
-
-        // Cleanup the event listener on component unmount
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-        };
-    }, []);
-
     return (
         <div className='min-h-[calc(100vh-120px)] md:flex hidden'>
             <aside className='bg-white min-h-full w-full max-w-60 customShadow'>
@@ -60,12 +38,7 @@ const AdminPanel = () => {
                 </nav>
             </aside>
             <main className='w-full h-full p-2'>
-                <button
-                    className='mb-4 p-2 bg-gray-400 text-white rounded'
-                    onClick={handleBack} // Navigate back to the previous page
-                >
-                    Go Back
-                </button>
+                {/* Removed Go Back button */}
                 <Outlet />
             </main>
         </div>
