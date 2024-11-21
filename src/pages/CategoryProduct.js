@@ -1,13 +1,13 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import productCategory from '../helpers/productCategory';
 import VerticalProductCart from '../components/VerticalProductCart';
 import SummaryApi from '../common';
-import RangeSlider from "react-range-slider-input";
-import "react-range-slider-input/dist/style.css";
+import RangeSlider from 'react-range-slider-input';
+import 'react-range-slider-input/dist/style.css';
+
 
 const CategoryProduct = () => {
-  const [searchParams] = useSearchParams() 
   const [data, setData] = useState([]);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -21,70 +21,86 @@ const CategoryProduct = () => {
     urlCategoryListObject[el] = true;
   });
 
+
   const [selectCategory, setSelectCategory] = useState(urlCategoryListObject);
   const [filterCL, setFilterCL] = useState([]);
   const [sortBy, setSoryBy] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 0]);
-  const [selectedPriceRange, setSelectedPriceRange] = useState([0, 0]);
+  const [priceRangeObj, setPriceRangeObj] = useState([]) // [{categoryName, minPrice, maxPrice}]
+  const [selectedPriceRange, setSelectedPriceRange] = useState([0, 0]) // [10, 100]
+  const [priceRange, setPriceRange] = useState([]) // [minPrice, maxPrice]
+  const prevCategoryListLength = useRef(0);
 
-  const getPriceRange = useMemo(() => async (categorry) => {
-    const res = await fetch(SummaryApi.getPriceRange.url(categorry), {
-      method: SummaryApi.getPriceRange.method,
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!res.ok) {
-      setPriceRange([0, 0])
-    }
-
-    const { data } = await res.json()
-
-    return [data.minPrice, data.maxPrice]
-  }, [])
-
+  // price range logic
   useEffect(() => {
-    const get = async() => {
-      const allMinMaxPricePromise = urlCategoryListInArray.map((categorry) => getPriceRange(categorry))
-      const allMinMax = await Promise.all(allMinMaxPricePromise)
-      
-      const minPrices = allMinMax.map(range => range[0]); // [9, 20]
-      const maxPrices = allMinMax.map(range => range[1]); // [100, 300]
-      // Find the overall minimum and maximum
-      const overallMin = Math.min(...minPrices);
-      const overallMax = Math.max(...maxPrices);
+    const currentLength = urlCategoryListInArray.length;
+    const previousLength = prevCategoryListLength.current;
 
-      setPriceRange([overallMin, overallMax])
-      setSelectedPriceRange([overallMin, overallMax])
+    if (currentLength < previousLength) {
+      // Categories were removed
+      const updatedPriceRangeObj = priceRangeObj.filter(price =>
+        urlCategoryListInArray.includes(price.categoryName)
+      );
+      setPriceRangeObj(updatedPriceRangeObj);
+
+      // Update selectedPriceRange with the new overall min and max prices
+      if (updatedPriceRangeObj.length > 0) {
+        const allMinPrices = updatedPriceRangeObj.map(item => item.minPrice);
+        const allMaxPrices = updatedPriceRangeObj.map(item => item.maxPrice);
+        setSelectedPriceRange([Math.min(...allMinPrices), Math.max(...allMaxPrices)]);
+        setPriceRange([Math.min(...allMinPrices), Math.max(...allMaxPrices)]);
+      } else {
+        setSelectedPriceRange([]); // Reset if no categories remain
+        setPriceRange([]); // Reset if no categories remain
+      }
+    } else if (currentLength > previousLength) {
+      // Categories were added
+      const newCategories = urlCategoryListInArray.filter(
+        categoryName =>
+          !priceRangeObj.some(price => price.categoryName === categoryName)
+      );
+
+      // create fetch function
+      const fetchPriceDataByCategory = async (categoryName) => {
+        // Simulated API call to fetch price range for the given category
+        const res = await fetch(SummaryApi.getPriceRange.url(categoryName), {
+          method: SummaryApi.getPriceRange.method,
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const { data } = await res.json();
+        return data;
+      };
+
+      // Fetch data for new categories
+      newCategories.forEach(async (categoryName) => {
+        const data = await fetchPriceDataByCategory(categoryName);
+
+        setPriceRangeObj((state) => {
+          const updatedPriceRange = [...state, data]
+
+          // Update selectedPriceRange with the new overall min and max prices
+          const allMinPrices = updatedPriceRange.map(item => item.minPrice);
+          const allMaxPrices = updatedPriceRange.map(item => item.maxPrice);
+          setSelectedPriceRange([Math.min(...allMinPrices), Math.max(...allMaxPrices)]);
+          setPriceRange([Math.min(...allMinPrices), Math.max(...allMaxPrices)]);
+
+          return updatedPriceRange
+        });
+
+      });
     }
-    get()
-    
 
-    // getPriceRange(urlCategoryListInArray[0])
-  }, [urlCategoryListInArray])
+    // Update the previous length
+    prevCategoryListLength.current = currentLength;
+  }, [urlCategoryListInArray, priceRangeObj]);
 
 
-  const fetchData = async () => {
-    const response = await fetch(SummaryApi.filterProduct.url, {
-      method: SummaryApi.filterProduct.method,
-      headers: {
-        "content-type": "application/json"
-      },
-      body: JSON.stringify({
-        category: filterCL,
-        minPrice: selectedPriceRange[0],
-        maxPrice: selectedPriceRange[1] || 1000,
-      })
-    });
-
-    const dataResponse = await response.json();
-    setData(dataResponse?.data || []);
-  };
 
   const handleSelectCategory = (e) => {
-    const { value, checked } = e.target;
+    const { name, value, checked } = e.target;
     setSelectCategory((prev) => {
       return {
         ...prev,
@@ -93,9 +109,29 @@ const CategoryProduct = () => {
     });
   };
 
+  // product fetch based on category and price range
   useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetch(SummaryApi.filterProduct.url, {
+        method: SummaryApi.filterProduct.method,
+        headers: {
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          category: filterCL,
+          minPrice: selectedPriceRange[0],
+          maxPrice: selectedPriceRange[1]
+        })
+      });
+
+
+      const dataResponse = await response.json();
+      setData(dataResponse?.data || []);
+    };
+
     fetchData();
   }, [filterCL, selectedPriceRange]);
+
 
   useEffect(() => {
     const arrayOfCategory = Object.keys(selectCategory).map(categoryKeyName => {
@@ -106,73 +142,56 @@ const CategoryProduct = () => {
     }).filter(el => el);
     setFilterCL(arrayOfCategory);
 
+
     const urlFormat = arrayOfCategory.map((el, index) => {
       return `category=${el}` + (index < arrayOfCategory.length - 1 ? '&&' : '');
     });
     navigate("/product-category?" + urlFormat.join(""));
   }, [selectCategory]);
 
+  // sotring logic
+  useEffect(() => {
+    if (sortBy === "asc") {
+      setData(prev => [...prev].sort((a, b) => a.sellingPrice - b.sellingPrice));
+    }
+    if (sortBy === "dsc") {
+      setData(prev => [...prev].sort((a, b) => b.sellingPrice - a.sellingPrice));
+    }
+  }, [data, sortBy])
+
+
   const handleOnChangeSortBy = (e) => {
     const { value } = e.target;
     setSoryBy(value);
-    if (value === "asc") {
-      setData(prev => [...prev].sort((a, b) => a.sellingPrice - b.sellingPrice));
-    }
-    if (value === "dsc") {
-      setData(prev => [...prev].sort((a, b) => b.sellingPrice - a.sellingPrice));
-    }
   };
 
-  // const handleApplyPriceFilter = () => {
-  //   const filteredData = data.filter(product => {
-  //     return (
-  //       product.sellingPrice >= minPrice && product.sellingPrice <= maxPrice
-  //     );
-  //   });
-  //   setData(filteredData);
-  // };
 
-  // const resetPriceFilter = () => {
-  //   setMinPrice("");
-  //   setMaxPrice("");
-  //   fetchData();
-  // };
-
+  // Use the useEffect to navigate back when the backspace key is pressed
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === 'Backspace') {
-        event.preventDefault();
-        navigate(-1);
+        event.preventDefault(); // Optional: Prevent the default behavior if needed
+        navigate(-1); // Navigate back to the previous page
       }
     };
 
+
     window.addEventListener('keydown', handleKeyDown);
 
+
+    // Cleanup the event listener on component unmount
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [navigate]);
 
-  // const handleMinPriceChange = (e) => {
-  //   const value = e.target.value;
-  //   if (value === '' || /^[0-9]*$/.test(value)) {
-  //     setMinPrice(value);
-  //   }
-  // };
-
-  // const handleMaxPriceChange = (e) => {
-  //   const value = e.target.value;
-  //   if (value === '' || /^[0-9]*$/.test(value)) {
-  //     setMaxPrice(value);
-  //   }
-  // };
 
   return (
     <div className='container mx-auto p-4'>
       {/***Desktop Version */}
       <div className='hidden lg:grid grid-cols-[200px,1fr]'>
         {/***Left Part */}
-        <div className='bg-white p-2 min-h-[calc(115vh-200px)] overflow-y-scroll space-y-6'>
+        <div className='bg-white p-2 min-h-[calc(115vh-200px)] overflow-y-scroll space-y-8'>
           <div className=''>
             <h2 className='text-sm uppercase font-medium text-slate-500 border border-slate-300 justify-center text-center pb-1'>Sort By Price</h2>
             <form className='text-sm flex flex-col gap-2 py-2'>
@@ -187,45 +206,26 @@ const CategoryProduct = () => {
             </form>
           </div>
 
-          <div className=''>
+          {/* price range */}
+          <div>
             <h2 className='text-sm uppercase font-medium text-slate-500 border border-slate-300 justify-center text-center pb-1'>Price Range</h2>
-            <form className='text-sm py-2'>
-              <div className='flex flex-col gap-4'>
 
-                {/* Sliders */}
-                <div className='space-y-3'>
-                  <div className='flex justify-between items-center'>
-                    <small className='inline-block'>Min: {selectedPriceRange[0]}</small>
-                    <small className='inline-block'>Max: {selectedPriceRange[1]}</small>
-                  </div>
-                  <RangeSlider
-                    min={priceRange[0]}
-                    max={priceRange[1]}
-                    step={10}
-                    value={selectedPriceRange}
-                    onInput={setSelectedPriceRange}
-                  />
+            <div className='py2 flex flex-col gap-4 mt-2'>
+              {/* Sliders */}
+              <div className='space-y-3'>
+                <div className='flex justify-between items-center'>
+                  <small className='inline-block'>Min: {selectedPriceRange[0]}</small>
+                  <small className='inline-block'>Max: {selectedPriceRange[1]}</small>
                 </div>
+                <RangeSlider
+                  min={priceRange[0]}
+                  max={priceRange[1]}
+                  step={1}
+                  value={selectedPriceRange}
+                  onInput={setSelectedPriceRange}
+                />
               </div>
-
-
-              {/* <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={handleApplyPriceFilter}
-                  className="bg-blue-500 text-white p-2 mt-2 w-full"
-                >
-                  Apply Filter
-                </button>
-                <button
-                  type="button"
-                  onClick={resetPriceFilter}
-                  className="bg-gray-300 text-black p-2 mt-2 w-full"
-                >
-                  Clear Filter
-                </button>
-              </div> */}
-            </form>
+            </div>
           </div>
 
           <div className=''>
@@ -244,7 +244,6 @@ const CategoryProduct = () => {
             </form>
           </div>
         </div>
-
         {/***Right Part */}
         <div className='px-4'>
           <p className='font-semibold text-blue-800 text-lg my-1 bg-white flex justify-center items-center w-auto'>Search Results: {data.length}</p>
@@ -260,5 +259,6 @@ const CategoryProduct = () => {
     </div>
   );
 };
+
 
 export default CategoryProduct;
