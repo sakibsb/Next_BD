@@ -12,7 +12,7 @@ const Home = () => {
       <Navbar />
 
       {/* Category List */}
-      <div className="my-6">
+      <div className="my-2">
         <CategoryList />
       </div>
 
@@ -52,9 +52,6 @@ const Home = () => {
           <VerticalCardProduct category="earphones" heading="শীর্ষ রেটেড ইয়ারফোন" />
         </div>
         <div className="col-span-1">
-          <HorizontalCardProduct category="processor" heading="প্রসেসর" />
-        </div>
-        <div className="col-span-1">
           <VerticalCardProduct category="television" heading="টেলিভিশন" />
         </div>
         <div className="col-span-1">
@@ -64,11 +61,19 @@ const Home = () => {
           <VerticalCardProduct category="trimmers" heading="ট্রিমার" />
         </div>
         <div className="col-span-1">
+          <VerticalCardProduct category="books" heading="সেরা বিক্রিত বই" />
+        </div>
+        
+        <div className="col-span-1">
+          <HorizontalCardProduct category="watches" heading="সেরা ঘড়ি" />
+        </div>
+        <div className="col-span-1">
           <HorizontalCardProduct category="refrigerator" heading="রেফ্রিজারেটর" />
         </div>
         <div className="col-span-1">
           <HorizontalCardProduct category="printers" heading="প্রিন্টার" />
         </div>
+        
       </div>
       <VerticalCardProduct category="books" heading="সাম্প্রতিক বিক্রয়" />
     </div>

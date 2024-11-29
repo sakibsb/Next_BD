@@ -1,77 +1,104 @@
-import React, { useEffect, useState } from 'react';
-import SummaryApi from '../common';
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
-    const [categories, setCategories] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const categoryLoading = new Array(5).fill(null); // Placeholder for loading state
+    // Expanded data for main categories and subcategories
+    const categories = [
+        {
+            name: "বই",
+            subcategories: ["উপন্যাস", "কবিতা", "কমিকস", "পাঠ্যবই", "জীবনী"],
+        },
+        {
+            name: "ইলেকট্রনিকস",
+            subcategories: ["টিভি", "ফ্রিজ", "মোবাইল", "ল্যাপটপ", "ড্রোন"],
+        },
+        {
+            name: "ফ্যাশন",
+            subcategories: ["পুরুষ", "নারী", "শিশু", "জুতা", "ব্যাগ"],
+        },
+        {
+            name: "গৃহস্থালি সামগ্রী",
+            subcategories: [
+                "মাইক্রোওয়েভ",
+                "এয়ার কন্ডিশনার",
+                "ভ্যাকুয়াম ক্লিনার",
+                "ওভেন",
+                "ডিশওয়াশার",
+            ],
+        },
+        {
+            name: "খেলাধুলা",
+            subcategories: ["ফুটবল", "ক্রিকেট", "ব্যাডমিন্টন", "জার্সি", "র্যাকেট"],
+        },
+        {
+            name: "স্বাস্থ্যসেবা",
+            subcategories: ["মাস্ক", "গ্লাভস", "ওষুধ", "স্যানিটাইজার", "থার্মোমিটার"],
+        },
+        {
+            name: "সৌন্দর্য",
+            subcategories: ["মেকআপ", "স্কিন কেয়ার", "চুলের পণ্য", "পারফিউম", "লোশন"],
+        },
+        {
+            name: "খাবার",
+            subcategories: ["ফলমূল", "শাকসবজি", "মশলা", "দুধ", "জুস"],
+        },
+        {
+            name: "গাড়ি ও বাইক",
+            subcategories: ["গাড়ি পার্টস", "বাইক পার্টস", "হেলমেট", "টায়ার", "অ্যাক্সেসরিজ"],
+        },
+        {
+            name: "শিশুদের পণ্য",
+            subcategories: ["টয়", "পোশাক", "ডাইপার", "ফিডার", "শিক্ষামূলক খেলনা"],
+        },
+    ];
 
-    const fetchCategories = async () => {
-        try {
-            const response = await fetch(SummaryApi.categoryProduct.url);
-            const dataResponse = await response.json();
-            if (dataResponse.success) {
-                setCategories(dataResponse.data);
-            } else {
-                console.error("Error fetching categories:", dataResponse.message);
-            }
-        } catch (error) {
-            console.error("Network error:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchCategories();
-
-        // Event listener for back button functionality
-        const handleBackButton = (event) => {
-            if (event.key === "Backspace") { // Detecting the Backspace key
-                event.preventDefault(); // Prevent default action
-                window.history.back(); // Go back to the previous page
-            }
-        };
-
-        // Add event listener to handle back button press
-        window.addEventListener("keydown", handleBackButton);
-
-        // Cleanup the event listener on component unmount
-        return () => {
-            window.removeEventListener("keydown", handleBackButton);
-        };
-    }, []); // Only run on mount and unmount
+    const [activeCategory, setActiveCategory] = useState(null);
 
     return (
-        <nav className="bg-blue-600 p-4 shadow-md">
-            <div className="container mx-auto flex justify-between items-center">
-                <div className='flex items-center gap-6 overflow-x-auto scrollbar-none'> {/* Increased gap for better padding */}
-                    {loading ? (
-                        categoryLoading.map((_, index) => (
-                            <div
-                                className='h-10 w-24 rounded-full bg-slate-300 animate-pulse'
-                                key={`navLoading-${index}`}
-                            />
-                        ))
-                    ) : (
-                        categories.length > 0 ? (
-                            categories.map((category, index) => (
-                                <Link
-                                    to={`/product-category?category=${category?.category}`} // Same route as CategoryList
-                                    className='text-white hover:text-yellow-300 transition'
-                                    key={`${category?.category}-${index}`}
-                                >
-                                    <p className='text-sm md:text-base capitalize'>{category?.category}</p> {/* All names in English */}
-                                </Link>
-                            ))
-                        ) : (
-                            <p className='text-center text-gray-500'>No categories available.</p>
-                        )
-                    )}
+        <div>
+            {/* Main Navbar */}
+            <nav className="bg-white p-4 shadow-md">
+                <div className="container mx-auto flex justify-between items-center flex-wrap">
+                    <div className="flex items-center gap-6 overflow-x-auto scrollbar-hide">
+                        {categories.map((category, index) => (
+                            <button
+                                key={index}
+                                onClick={() =>
+                                    setActiveCategory(
+                                        activeCategory?.name === category.name ? null : category
+                                    )
+                                }
+                                className={`text-black px-4 py-2 rounded-md text-lg font-medium transition-all duration-300 ${activeCategory?.name === category.name
+                                    ? "bg-blue-300 text-black"
+                                    : "hover:bg-blue-200 hover:text-black"
+                                    }`}
+                            >
+                                {category.name}
+                            </button>
+                        ))}
+                    </div>
                 </div>
-            </div>
-        </nav>
+            </nav>
+
+            {/* Subcategory Section */}
+            {activeCategory && (
+                <nav className="bg-gray-100 p-3 shadow-inner border-t border-gray-300">
+                    <div className="container mx-auto flex justify-between items-center flex-wrap">
+                        <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide">
+                            {activeCategory.subcategories.map((subcategory, index) => (
+                                <Link
+                                    key={index}
+                                    to={`/subcategory/${subcategory.toLowerCase()}`}
+                                    className="text-gray-700 hover:text-blue-500 px-3 py-2 rounded-md text-base font-normal transition-all duration-300"
+                                >
+                                    {subcategory}
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                </nav>
+            )}
+        </div>
     );
 };
 

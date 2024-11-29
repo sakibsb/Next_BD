@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Routes, Route } from 'react-router-dom'; // Import Routes and Route
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { ToastContainer } from 'react-toastify';
@@ -11,52 +11,62 @@ import Context from './context';
 import { useDispatch } from 'react-redux';
 import { setUserDetails } from './store/userSlice';
 
+import BecomeSeller from './pages/BecomeSeller';
+
 function App() {
-  const dispatch = useDispatch()
-  const [cartProductCount, setCartProductCount] = useState(0)
-  const [cartData, setCartData] = useState([])
+  const dispatch = useDispatch();
+  const [cartProductCount, setCartProductCount] = useState(0);
+  const [cartData, setCartData] = useState([]);
 
   const fetchUserDetails = async () => {
     const dataResponse = await fetch(SummaryApi.current_user.url, {
       method: SummaryApi.current_user.method,
-      credentials: 'include'
-    })
+      credentials: 'include',
+    });
 
-    const dataApi = await dataResponse.json()
+    const dataApi = await dataResponse.json();
 
     if (dataApi.success) {
-      dispatch(setUserDetails(dataApi.data))
+      dispatch(setUserDetails(dataApi.data));
     }
-  }
+  };
 
   const fetchUserAddToCart = async () => {
     const dataResponse = await fetch(SummaryApi.addToCartProductCount.url, {
       method: SummaryApi.addToCartProductCount.method,
-      credentials: 'include'
-    })
+      credentials: 'include',
+    });
 
-    const dataApi = await dataResponse.json()
+    const dataApi = await dataResponse.json();
 
-    setCartProductCount(dataApi?.data?.count)
-  }
-  /**user Details */
+    setCartProductCount(dataApi?.data?.count);
+  };
+
+  /** user Details */
   useEffect(() => {
-    fetchUserDetails()
+    fetchUserDetails();
 
-    fetchUserAddToCart()
-  }, [])
+    fetchUserAddToCart();
+  }, []);
+
   return (
     <>
-      <Context.Provider value={{
-        fetchUserDetails,
-        cartProductCount,
-        fetchUserAddToCart,
-        cartData,
-        setCartData
-      }}>
-        <ToastContainer position='top-center' />
+      <Context.Provider
+        value={{
+          fetchUserDetails,
+          cartProductCount,
+          fetchUserAddToCart,
+          cartData,
+          setCartData,
+        }}
+      >
+        <ToastContainer position="top-center" />
         <Header />
-        <main className='min-h-[calc(100vh-120px)] pt-16'>
+        <main className="min-h-[calc(100vh-120px)] pt-16">
+          <Routes> {/* Wrap Route inside Routes */}
+            <Route path="/become-seller" element={<BecomeSeller />} />
+            {/* Add other routes here if needed */}
+          </Routes>
           <Outlet />
         </main>
         <Footer />
