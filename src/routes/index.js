@@ -12,7 +12,6 @@ import ProductDetails from "../pages/ProductDetails";
 import Cart from "../pages/Cart";
 import SearchProduct from "../pages/SearchProduct";
 import PurchasePage from "../pages/purchase";
-import BecomeSeller from "../pages/BecomeSeller";
 
 const router = createBrowserRouter([
     {
@@ -56,10 +55,6 @@ const router = createBrowserRouter([
             {
                 path: "search",
                 element: <SearchProduct />
-            },
-            {
-                path: "become-seller", // Add this route
-                element: <BecomeSeller />,
             },
             {
                 path: "admin-panel",

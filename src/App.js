@@ -11,7 +11,7 @@ import Context from './context';
 import { useDispatch } from 'react-redux';
 import { setUserDetails } from './store/userSlice';
 
-import BecomeSeller from './pages/BecomeSeller';
+
 
 function App() {
   const dispatch = useDispatch();
@@ -63,10 +63,6 @@ function App() {
         <ToastContainer position="top-center" />
         <Header />
         <main className="min-h-[calc(100vh-120px)] pt-16">
-          <Routes> {/* Wrap Route inside Routes */}
-            <Route path="/become-seller" element={<BecomeSeller />} />
-            {/* Add other routes here if needed */}
-          </Routes>
           <Outlet />
         </main>
         <Footer />
