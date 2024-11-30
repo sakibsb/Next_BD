@@ -1,92 +1,102 @@
-const backendDomain = "http://localhost:8080"
+const backendDomain = "http://localhost:8080"; // Ensure backend is running here
 
 const SummaryApi = {
     signUP: {
         url: `${backendDomain}/api/signup`,
-        method: "post"
+        method: "POST"
     },
     signIN: {
         url: `${backendDomain}/api/signin`,
-        method: "post"
+        method: "POST"
     },
-
     current_user: {
         url: `${backendDomain}/api/user-details`,
-        method: "get"
+        method: "GET"
     },
     logout_user: {
         url: `${backendDomain}/api/userLogout`,
-        method: "get"
+        method: "GET"
+    },
+    becomeSeller: {
+        url: `${backendDomain}/api/sellers/become-seller`, // Ensure this API route exists in backend
+        method: "POST",
+    },
+    getSellerRequests: {
+        url: `${backendDomain}/api/sellers/requests`,
+        method: "GET",
+    },
+    updateSellerRequest: {
+        url: (id) => `${backendDomain}/api/sellers/requests/${id}`,
+        method: "PATCH",
     },
     allUser: {
         url: `${backendDomain}/api/all-user`,
-        method: "get"
+        method: "GET"
     },
     updateUser: {
         url: `${backendDomain}/api/update-user`,
-        method: "post"
+        method: "POST"
     },
     uploadProduct: {
         url: `${backendDomain}/api/upload-product`,
-        method: "post"
+        method: "POST"
     },
     allProduct: {
         url: `${backendDomain}/api/get-product`,
-        method: "get"
+        method: "GET"
     },
     updateProduct: {
         url: `${backendDomain}/api/update-product`,
-        method: "post"
+        method: "POST"
     },
     categoryProduct: {
         url: `${backendDomain}/api/get-categoryProduct`,
-        method: "get"
+        method: "GET"
     },
     categoryWiseProduct: {
         url: `${backendDomain}/api/category-Product`,
-        method: "post"
+        method: "POST"
     },
     productDetails: {
         url: `${backendDomain}/api/product-details`,
-        method: "post"
+        method: "POST"
     },
     addToCartProduct: {
         url: `${backendDomain}/api/addtocart`,
-        method: "post"
+        method: "POST"
     },
     addToCartProductCount: {
         url: `${backendDomain}/api/countAddToCart`,
-        method: "get"
+        method: "GET"
     },
     addToCartViewProduct: {
         url: `${backendDomain}/api/cart-product-view`,
-        method: "get"
+        method: "GET"
     },
     updateCartProduct: {
         url: `${backendDomain}/api/update`,
-        method: "post"
+        method: "POST"
     },
     deleteCartProduct: {
         url: `${backendDomain}/api/delete`,
-        method: "post"
+        method: "POST"
     },
     searchProduct: {
         url: `${backendDomain}/api/search`,
-        method: "get"
+        method: "GET"
     },
     filterProduct: {
         url: `${backendDomain}/api/filter-product`,
-        method: "post"
+        method: "POST"
     },
-    getPlaymentLink: {
+    getPaymentLink: {
         url: `${backendDomain}/api/get-payment-link`,
-        method: "post"
+        method: "POST"
     },
     getPriceRange: {
         url: (category) => `${backendDomain}/api/price-range/${category}`,
-        method: "get"
+        method: "GET"
     },
-
 }
 
-export default SummaryApi
+export default SummaryApi;

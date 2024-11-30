@@ -10,6 +10,9 @@ import SummaryApi from './common';
 import Context from './context';
 import { useDispatch } from 'react-redux';
 import { setUserDetails } from './store/userSlice';
+import BecomeSeller from './pages/BecomeSeller';
+import AdminSellerRequests from './pages/AdminSellerRequests';
+import AdminDashboard from './pages/AdminDashboard';
 
 
 
@@ -63,6 +66,11 @@ function App() {
         <ToastContainer position="top-center" />
         <Header />
         <main className="min-h-[calc(100vh-120px)] pt-16">
+          <Routes>
+            <Route path="/become-seller" element={<BecomeSeller />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/seller-requests" element={<AdminSellerRequests />} />
+          </Routes>
           <Outlet />
         </main>
         <Footer />
