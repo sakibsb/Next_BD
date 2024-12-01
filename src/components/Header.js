@@ -72,7 +72,8 @@ const Header = () => {
 
         {/* User and Cart Icons */}
         <div className="flex items-center gap-6">
-          {/* "Become a Seller" Button */}
+          {/* Become Seller Button */}
+
           {(!user?._id || user?.role !== ROLE.ADMIN) && (
             <Link to="/become-seller" className="px-4 py-1 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition duration-300">
               Become a Seller

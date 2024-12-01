@@ -58,8 +58,8 @@ const router = createBrowserRouter([
                 element: <SearchProduct />
             },
             {
-                path: "become-seller", // Add the Become Seller page route
-                element: <BecomeSeller />
+                path: "become-seller", // Add this route
+                element: <BecomeSeller />,
             },
             {
                 path: "admin-panel",
