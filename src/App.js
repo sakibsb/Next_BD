@@ -71,7 +71,6 @@ function App() {
             {/* Add other routes here if needed */}
             <Route path="/admin-panel" element={<AdminPanel />}>
               <Route path="seller-requests" element={<SellerRequests />} />
-              {/* Add other nested routes if needed */}
             </Route>
           </Routes>
           <Outlet />

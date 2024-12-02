@@ -4,6 +4,7 @@ import Context from '../context';
 import displayBDCurrency from '../helpers/displayCurrency';
 import { MdDeleteSweep } from "react-icons/md";
 import { useNavigate } from 'react-router-dom';
+import { loadStripe } from '@stripe/stripe-js';
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -94,6 +95,28 @@ const Cart = () => {
     }
   };
 
+  const handlePayment = async () => {
+
+    const stripePromise = await loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY)
+    const response = await fetch(SummaryApi.payment.url, {
+      method: SummaryApi.payment.method,
+      credentials: 'include',
+      headers: {
+        "content-type": 'application/json'
+      },
+      body: JSON.stringify({
+        cartItems: context.cartData
+      })
+    })
+
+    const responseData = await response.json()
+    if (responseData?.id) {
+      stripePromise.redirectToCheckout({ sessionId: responseData.id })
+    }
+
+    console.log("payment response", responseData)
+  }
+
   const totalQ = context.cartData?.reduce((previousValue, currentValue) => previousValue + currentValue.quantity, 0);
   const totalprize = context.cartData?.reduce((preve, curr) => preve + (curr.quantity * curr?.productId?.sellingPrice), 0);
 
@@ -138,33 +161,33 @@ const Cart = () => {
           }
         </div>
         {/*** Total Product */}
-        <div className='mt-5 lg:mt-0 w-full max-w-sm'>
-          {
-            loading ? (
-              <div className='h-36 bg-gray-200 border border-gray-200 animate-pulse'></div>
-            ) : (
-              <div className='h-36 bg-off-white rounded-lg shadow-md'>
-                <h2 className='text-white bg-gray-700 px-4 py-2 rounded-t-lg text-center'>Summary</h2>
-                <div className='flex justify-between px-4 py-2'>
-                  <p className='text-sm font-semibold'>Quantity:</p>
-                  <p className='text-sm font-semibold'>{totalQ}</p>
-                </div>
-                <div className='flex justify-between px-4 py-2'>
-                  <p className='text-sm font-semibold'>Total Price:</p>
-                  <p className='text-sm font-semibold'>{displayBDCurrency(totalprize)}</p>
-                </div>
-                <div className='flex justify-center'>
-                  <button
-                    className='rounded-md bg-blue-600 hover:bg-blue-700 transition-colors text-white p-3 w-full mt-3'
-                    onClick={() => navigate('/purchase')}
-                  >
-                    Proceed to Payment
-                  </button>
-                </div>
-              </div>
-            )
-          }
-        </div>
+        {
+          context.cartData[0] && (
+            <div className='mt-5 lg:mt-0 w-full max-w-sm'>
+              {
+                loading ? (
+                  <div className='h-36 bg-gray-200 border border-gray-200 animate-pulse'></div>
+                ) : (
+                  <div className='h-36 bg-off-white rounded-lg shadow-md'>
+                    <h2 className='text-white bg-gray-700 px-4 py-2 rounded-t-lg text-center'>Summary</h2>
+                    <div className='flex justify-between px-4 py-2'>
+                      <p className='text-sm font-semibold'>Quantity:</p>
+                      <p className='text-sm font-semibold'>{totalQ}</p>
+                    </div>
+                    <div className='flex justify-between px-4 py-2'>
+                      <p className='text-sm font-semibold'>Total Price:</p>
+                      <p className='text-sm font-semibold'>{displayBDCurrency(totalprize)}</p>
+                    </div>
+                    <div className='flex justify-center'>
+                      <button className='bg-blue-600 p-2 text-white w-full mt-2' onClick={handlePayment}>Payment</button>
+                    </div>
+                  </div>
+                )
+              }
+            </div>
+          )
+        }
+        
       </div>
     </div>
   );

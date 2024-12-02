@@ -90,9 +90,17 @@ const SummaryApi = {
         url: `${backendDomain}/api/filter-product`,
         method: "post"
     },
-    getPlaymentLink: {
-        url: `${backendDomain}/api/get-payment-link`,
-        method: "post"
+    payment: {
+        url: `${backendDomain}/api/checkout`,
+        method: 'post'
+    },
+    getOrder: {
+        url: `${backendDomain}/api/order-list`,
+        method: 'get'
+    },
+    allOrder: {
+        url: `${backendDomain}/api/all-order`,
+        method: 'get'
     },
     getPriceRange: {
         url: (category) => `${backendDomain}/api/price-range/${category}`,

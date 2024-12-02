@@ -110,12 +110,7 @@ const Header = () => {
                       Admin Panel
                     </Link>
                   )}
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full text-left text-red-600 hover:bg-red-100 p-2 rounded-md"
-                  >
-                    Logout
-                  </button>
+                  <Link to={'/order'} className='whitespace-nowrap hidden md:block hover:bg-slate-100 p-2' onClick={() => setMenuDisplay(preve => !preve)}>Order</Link>
                 </nav>
               </div>
             )}

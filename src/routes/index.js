@@ -13,6 +13,10 @@ import Cart from "../pages/Cart";
 import SearchProduct from "../pages/SearchProduct";
 import PurchasePage from "../pages/purchase";
 import BecomeSeller from "../pages/BecomeSeller";
+import Cancel from "../pages/Cancel";
+import Success from "../pages/Success";
+import OrderPage from "../pages/OrderPage";
+import AllOrder from "../pages/AllOrder";
 
 const router = createBrowserRouter([
     {
@@ -50,12 +54,20 @@ const router = createBrowserRouter([
                 element: <Cart />
             },
             {
-                path: "purchase",
-                element: <PurchasePage />
+                path: 'success',
+                element: <Success />
+            },
+            {
+                path: "cancel",
+                element: <Cancel />
             },
             {
                 path: "search",
                 element: <SearchProduct />
+            },
+            {
+                path: 'order',
+                element: <OrderPage />
             },
             {
                 path: "become-seller", // Add this route
@@ -72,6 +84,10 @@ const router = createBrowserRouter([
                     {
                         path: "products",
                         element: < AllProducts />
+                    },
+                    {
+                        path: "all-orders",
+                        element: <AllOrder />
                     }
                 ]
             },
