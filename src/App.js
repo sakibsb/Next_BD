@@ -12,6 +12,9 @@ import { useDispatch } from 'react-redux';
 import { setUserDetails } from './store/userSlice';
 
 import BecomeSeller from './pages/BecomeSeller';
+import AdminPanel from './pages/AdminPanel';
+import SellerRequests from './pages/SellerRequests'
+
 
 function App() {
   const dispatch = useDispatch();
@@ -66,6 +69,10 @@ function App() {
           <Routes> {/* Wrap Route inside Routes */}
             <Route path="/become-seller" element={<BecomeSeller />} />
             {/* Add other routes here if needed */}
+            <Route path="/admin-panel" element={<AdminPanel />}>
+              <Route path="seller-requests" element={<SellerRequests />} />
+              {/* Add other nested routes if needed */}
+            </Route>
           </Routes>
           <Outlet />
         </main>
