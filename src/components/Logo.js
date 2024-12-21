@@ -25,7 +25,7 @@ const Logo = ({ w = 370, h = 155, textColor = "#3a69e9" }) => {
                 />
             </g>
             <text x="50" y="130" fontSize="50" fontWeight="bold" fill={textColor}>
-                QuickCart
+                NEXT_BD
             </text>
         </svg>
     );
